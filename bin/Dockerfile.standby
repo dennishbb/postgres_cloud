@@ -1,0 +1,16 @@
+FROM postgres:latest
+
+# Install gosu
+RUN apt-get update && apt-get install -y gosu && rm -rf /var/lib/apt/lists/*
+
+# Create the necessary directory with correct permissions
+RUN mkdir -p /home/postgres && \
+    chown -R postgres:postgres /home/postgres && \
+    chmod -R 700 /home/postgres
+
+# Copy the setup script and make it executable
+COPY setup-replication.sh /usr/local/bin/setup-replication.sh
+RUN chmod +x /usr/local/bin/setup-replication.sh
+
+ENTRYPOINT ["/usr/local/bin/setup-replication.sh"]
+

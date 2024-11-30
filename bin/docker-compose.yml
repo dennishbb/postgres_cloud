@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  postgres-primary:
+    image: postgres:latest
+    container_name: postgres-primary
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
+    volumes:
+      - primary_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres-network
+
+  postgres-standby:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: postgres-standby
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    depends_on:
+      - postgres-primary
+    volumes:
+      - standby_data:/var/lib/postgresql/data
+    networks:
+      - postgres-network
+
+volumes:
+  primary_data:
+  standby_data:
+
+networks:
+  postgres-network:
+    driver: bridge
+
